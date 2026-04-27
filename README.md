@@ -1,11 +1,11 @@
-# Bulkhead Demo (Spring Boot + Resilience4j + Virtual Threads)
+# Bulkhead Core (Spring Boot + Resilience4j + Virtual Threads)
 
-![Build](https://github.com/ByteEntropyCom/bulkhead-demo/actions/workflows/ci-cd.yml/badge.svg)
+![Build](https://github.com/ByteEntropyCom/bulkhead-core/actions/workflows/ci-cd.yml/badge.svg)
 ![Java](https://img.shields.io/badge/Java-21-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen)
 ![Resilience4j](https://img.shields.io/badge/Resilience4j-2.2.0-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Issues](https://img.shields.io/github/issues/ByteEntropyCom/bulkhead-demo)
+![Issues](https://img.shields.io/github/issues/ByteEntropyCom/bulkhead-core)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
 A project showcasing **Semaphore Bulkhead** and **Thread Pool Bulkhead** using Resilience4j in a Spring Boot 3.2+ application with **Java 21 Virtual Threads**.
@@ -38,15 +38,15 @@ A project showcasing **Semaphore Bulkhead** and **Thread Pool Bulkhead** using R
 
 **  Run the Spring Boot application: ** 
 
-``` java -jar target/bulkhead-demo-0.0.1-SNAPSHOT.jar```
+``` java -jar target/bulkhead-core-0.0.1-SNAPSHOT.jar```
 
 ## 3. Docker
  
  ** Build and run with Docker: ** 
 
  ```
-docker build -t bulkhead-demo:latest .
-docker run -p 8080:8080 bulkhead-demo:latest
+docker build -t bulkhead-core:latest .
+docker run -p 8080:8080 bulkhead-core:latest
 ```
 
 ## 3. Test Endpoints
@@ -64,7 +64,7 @@ curl http://localhost:8080/threadpool
 **Default properties:** (`application.properties`)
 
 ```properties
-spring.application.name=bulkhead-demo
+spring.application.name=bulkhead-core
 server.port=8080
 
 spring.threads.virtual.enabled=true
