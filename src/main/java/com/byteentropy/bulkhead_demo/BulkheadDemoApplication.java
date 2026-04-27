@@ -1,4 +1,4 @@
-package com.byteentropy.bulkhead_demo;
+package com.byteentropy.bulkhead_core;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
