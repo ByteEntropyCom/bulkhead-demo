@@ -18,17 +18,14 @@ class BulkheadDemoApplicationTests {
     private ExternalApiService apiService;
 
     @Test
-    void testSemaphoreBulkheadLimit() throws InterruptedException {
-        // WARM UP: Give Resilience4j a moment to initialize in the CI environment
-        apiService.slowSemaphoreCall();
-        Thread.sleep(1000); 
+    void testSemaphoreBulkheadLimit() {
+        // High pressure: 50 requests at once to force the 5-limit bulkhead to fail
+        int totalRequests = 50;
 
-        int totalRequests = 10;
-
-        // Use parallelStream to ensure high-pressure simultaneous firing
         List<CompletableFuture<String>> futures = IntStream.range(0, totalRequests)
-                .parallel() 
-                .mapToObj(i -> CompletableFuture.supplyAsync(() -> apiService.slowSemaphoreCall()))
+                .boxed()
+                .parallel() // Forces parallel submission
+                .map(i -> CompletableFuture.supplyAsync(() -> apiService.slowSemaphoreCall()))
                 .toList();
 
         List<String> results = futures.stream()
@@ -41,18 +38,19 @@ class BulkheadDemoApplicationTests {
         System.out.println("--- CI Semaphore Results ---");
         System.out.println("Success: " + successCount + " | Fallback: " + fallbackCount);
 
-        // In CI, we just want to prove the bulkhead is working by seeing AT LEAST some fallbacks
-        assertThat(fallbackCount).isGreaterThan(0);
-        assertThat(successCount).isLessThan(10); 
+        // Logic: Fallback MUST have triggered at least once
+        assertThat(fallbackCount).as("Bulkhead should have rejected some requests").isPositive();
     }
 
     @Test
     void testThreadPoolBulkheadIsolation() {
-        int totalRequests = 8;
+        // High pressure: 30 requests for a pool of 3 + 1 queue
+        int totalRequests = 30;
 
         List<CompletableFuture<String>> futures = IntStream.range(0, totalRequests)
+                .boxed()
                 .parallel()
-                .mapToObj(i -> apiService.isolatedThreadCall())
+                .map(i -> apiService.isolatedThreadCall())
                 .toList();
 
         List<String> results = futures.stream()
@@ -66,7 +64,6 @@ class BulkheadDemoApplicationTests {
         System.out.println("--- CI ThreadPool Results ---");
         System.out.println("Success: " + successCount + " | Fallback: " + fallbackCount);
 
-        assertThat(fallbackCount).isGreaterThan(0);
-        assertThat(successCount).isLessThan(8);
+        assertThat(fallbackCount).as("Thread pool should have been saturated").isPositive();
     }
 }
