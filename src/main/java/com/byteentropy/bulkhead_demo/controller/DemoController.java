@@ -1,6 +1,6 @@
-package com.byteentropy.bulkhead_demo.controller;
+package com.byteentropy.bulkhead_core.controller;
 
-import com.byteentropy.bulkhead_demo.service.ExternalApiService;
+import com.byteentropy.bulkhead_core.service.ExternalApiService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import java.util.concurrent.CompletableFuture;
