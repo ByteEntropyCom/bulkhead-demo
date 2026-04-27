@@ -1,4 +1,4 @@
-package com.byteentropy.bulkhead_demo;
+package com.byteentropy.bulkhead_core;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
