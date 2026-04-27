@@ -1,4 +1,4 @@
-package com.byteentropy.bulkhead_demo.service;
+package com.byteentropy.bulkhead_core.service;
 
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import org.springframework.stereotype.Service;
