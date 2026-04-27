@@ -7,8 +7,6 @@
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 ![Issues](https://img.shields.io/github/issues/ByteEntropyCom/bulkhead-demo)
-![Forks](https://img.shields.io/github/forks/ByteEntropyCom/bulkhead-demo)
-![Stars](https://img.shields.io/github/stars/ByteEntropyCom/bulkhead-demo)
 
 
 A demonstration project showcasing **Semaphore Bulkhead** and **Thread Pool Bulkhead** using Resilience4j in a Spring Boot 3.2+ application with **Java 21 Virtual Threads**.
