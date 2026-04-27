@@ -1,5 +1,15 @@
 # Bulkhead Demo (Spring Boot + Resilience4j + Virtual Threads)
 
+![Build](https://github.com/YOUR_USERNAME/bulkhead-demo/actions/workflows/ci-cd.yml/badge.svg)
+![Java](https://img.shields.io/badge/Java-21-blue)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen)
+![Resilience4j](https://img.shields.io/badge/Resilience4j-2.2.0-orange)
+![License](https://img.shields.io/badge/license-MIT-green)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+![Issues](https://img.shields.io/github/issues/YOUR_USERNAME/bulkhead-demo)
+![Forks](https://img.shields.io/github/forks/YOUR_USERNAME/bulkhead-demo)
+![Stars](https://img.shields.io/github/stars/YOUR_USERNAME/bulkhead-demo)
+
 This project demonstrates how to implement the **Bulkhead pattern** using **Resilience4j** in a **Spring Boot 3** application with **Java 21 Virtual Threads**.
 
 It showcases two types of bulkheads:
