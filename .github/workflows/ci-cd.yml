@@ -47,4 +47,4 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -t bulkhead-demo:latest .
+          docker build -t bulkhead-core:latest .
