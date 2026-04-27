@@ -7,14 +7,15 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.TestPropertySource;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.IntStream;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-// FORCE the limits here so CI cannot ignore them
 @TestPropertySource(properties = {
     "spring.threads.virtual.enabled=true",
     "resilience4j.bulkhead.instances.serviceA.max-concurrent-calls=2",
@@ -33,46 +34,40 @@ class BulkheadDemoApplicationTests {
 
     @Test
     void testSemaphoreBulkheadLimit() {
-        String url = "http://localhost:" + port + "/semaphore";
-        // We fired 30; with a limit of 2, we MUST see fallbacks
-        int totalRequests = 20;
-
-        List<CompletableFuture<String>> futures = IntStream.range(0, totalRequests)
-                .boxed()
-                .parallel()
-                .map(i -> CompletableFuture.supplyAsync(() -> restTemplate.getForObject(url, String.class)))
-                .toList();
-
-        List<String> results = futures.stream()
-                .map(CompletableFuture::join)
-                .toList();
-
-        long fallbackCount = results.stream().filter(r -> r.contains("Fallback")).count();
-        
-        System.out.println("--- CI Semaphore Fallbacks: " + fallbackCount + " ---");
-
-        assertThat(fallbackCount).as("Semaphore Bulkhead should have triggered").isGreaterThan(0);
+        runConcurrentTest("/semaphore", "Semaphore");
     }
 
     @Test
     void testThreadPoolBulkheadIsolation() {
-        String url = "http://localhost:" + port + "/threadpool";
+        runConcurrentTest("/threadpool", "ThreadPool");
+    }
+
+    private void runConcurrentTest(String path, String label) {
+        String url = "http://localhost:" + port + path;
         int totalRequests = 20;
 
-        List<CompletableFuture<String>> futures = IntStream.range(0, totalRequests)
-                .boxed()
-                .parallel()
-                .map(i -> CompletableFuture.supplyAsync(() -> restTemplate.getForObject(url, String.class)))
-                .toList();
+        // Use a dedicated pool to ensure all 20 requests hit the server at once
+        try (ExecutorService executor = Executors.newFixedThreadPool(totalRequests)) {
+            List<CompletableFuture<String>> futures = new ArrayList<>();
 
-        List<String> results = futures.stream()
-                .map(CompletableFuture::join)
-                .toList();
+            for (int i = 0; i < totalRequests; i++) {
+                futures.add(CompletableFuture.supplyAsync(() -> 
+                    restTemplate.getForObject(url, String.class), executor));
+            }
 
-        long fallbackCount = results.stream().filter(r -> r.contains("Fallback")).count();
+            List<String> results = futures.stream()
+                    .map(CompletableFuture::join)
+                    .toList();
 
-        System.out.println("--- CI ThreadPool Fallbacks: " + fallbackCount + " ---");
+            long fallbackCount = results.stream()
+                    .filter(r -> r != null && r.contains("Fallback"))
+                    .count();
 
-        assertThat(fallbackCount).as("Thread Pool Bulkhead should have triggered").isGreaterThan(0);
+            System.out.println("--- CI " + label + " Fallbacks: " + fallbackCount + " ---");
+
+            assertThat(fallbackCount)
+                .as(label + " Bulkhead should have triggered")
+                .isGreaterThan(0);
+        }
     }
 }
