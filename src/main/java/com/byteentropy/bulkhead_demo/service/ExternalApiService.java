@@ -10,14 +10,17 @@ public class ExternalApiService {
     @Bulkhead(name = "serviceA", fallbackMethod = "fallbackSemaphore")
     public String slowSemaphoreCall() {
         simulateDelay();
-        boolean isVirtual = Thread.currentThread().isVirtual();
-        return "Semaphore Success By Virtual Thread: " + isVirtual;
+        return "Semaphore Success By Virtual Thread: " + Thread.currentThread().isVirtual();
     }
 
+    // FIX: Body must be non-blocking to the caller. 
+    // The Bulkhead will intercept the returned CompletableFuture.
     @Bulkhead(name = "serviceB", type = Bulkhead.Type.THREADPOOL, fallbackMethod = "fallbackThreadPool")
     public CompletableFuture<String> isolatedThreadCall() {
-        simulateDelay();
-        return CompletableFuture.completedFuture("Thread Pool Success on: " + Thread.currentThread().getName());
+        return CompletableFuture.supplyAsync(() -> {
+            simulateDelay(); // The delay now happens INSIDE the bulkhead pool
+            return "Thread Pool Success on: " + Thread.currentThread().getName();
+        });
     }
 
     private void simulateDelay() {
@@ -29,8 +32,6 @@ public class ExternalApiService {
     }
 
     public String fallbackSemaphore(Throwable t) {
-        // Log the specific error (BulkheadFullException)
-        System.err.println("Semaphore Fallback triggered: " + t.getMessage());
         return "Fallback: Semaphore limit reached!";
     }
 
