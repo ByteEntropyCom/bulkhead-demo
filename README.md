@@ -1,6 +1,6 @@
 # Bulkhead Demo (Spring Boot + Resilience4j + Virtual Threads)
 
-![Build](https://github.com/YOUR_USERNAME/bulkhead-demo/actions/workflows/ci-cd.yml/badge.svg)
+![Build](https://github.com/ByteEntropyCom/bulkhead-demo/actions/workflows/ci-cd.yml/badge.svg)
 ![Java](https://img.shields.io/badge/Java-21-blue)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen)
 ![Resilience4j](https://img.shields.io/badge/Resilience4j-2.2.0-orange)
