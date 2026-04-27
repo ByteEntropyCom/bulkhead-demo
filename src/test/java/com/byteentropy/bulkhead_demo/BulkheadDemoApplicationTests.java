@@ -1,9 +1,10 @@
 package com.byteentropy.bulkhead_demo;
 
-import com.byteentropy.bulkhead_demo.service.ExternalApiService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -11,59 +12,60 @@ import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+// Use DEFINED_PORT or RANDOM_PORT to start the real server for the bouncer to work
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class BulkheadDemoApplicationTests {
 
+    @LocalServerPort
+    private int port;
+
     @Autowired
-    private ExternalApiService apiService;
+    private TestRestTemplate restTemplate;
 
     @Test
     void testSemaphoreBulkheadLimit() {
-        // High pressure: 50 requests at once to force the 5-limit bulkhead to fail
-        int totalRequests = 50;
+        String url = "http://localhost:" + port + "/semaphore";
+        int totalRequests = 30;
 
+        // Use parallelStream to flood the HTTP port
         List<CompletableFuture<String>> futures = IntStream.range(0, totalRequests)
                 .boxed()
-                .parallel() // Forces parallel submission
-                .map(i -> CompletableFuture.supplyAsync(() -> apiService.slowSemaphoreCall()))
+                .parallel()
+                .map(i -> CompletableFuture.supplyAsync(() -> restTemplate.getForObject(url, String.class)))
                 .toList();
 
         List<String> results = futures.stream()
                 .map(CompletableFuture::join)
                 .toList();
 
-        long successCount = results.stream().filter(r -> r.contains("Semaphore Success")).count();
         long fallbackCount = results.stream().filter(r -> r.contains("Fallback")).count();
+        
+        System.out.println("--- CI HTTP Semaphore Results ---");
+        System.out.println("Total: " + totalRequests + " | Fallbacks: " + fallbackCount);
 
-        System.out.println("--- CI Semaphore Results ---");
-        System.out.println("Success: " + successCount + " | Fallback: " + fallbackCount);
-
-        // Logic: Fallback MUST have triggered at least once
-        assertThat(fallbackCount).as("Bulkhead should have rejected some requests").isPositive();
+        assertThat(fallbackCount).as("Bulkhead must reject requests when hitting the HTTP endpoint").isPositive();
     }
 
     @Test
     void testThreadPoolBulkheadIsolation() {
-        // High pressure: 30 requests for a pool of 3 + 1 queue
-        int totalRequests = 30;
+        String url = "http://localhost:" + port + "/threadpool";
+        int totalRequests = 20;
 
         List<CompletableFuture<String>> futures = IntStream.range(0, totalRequests)
                 .boxed()
                 .parallel()
-                .map(i -> apiService.isolatedThreadCall())
+                .map(i -> CompletableFuture.supplyAsync(() -> restTemplate.getForObject(url, String.class)))
                 .toList();
 
         List<String> results = futures.stream()
-                .map(f -> f.handle((res, ex) -> res != null ? res : "Error"))
                 .map(CompletableFuture::join)
                 .toList();
 
-        long successCount = results.stream().filter(r -> r.contains("Thread Pool Success")).count();
         long fallbackCount = results.stream().filter(r -> r.contains("Fallback")).count();
 
-        System.out.println("--- CI ThreadPool Results ---");
-        System.out.println("Success: " + successCount + " | Fallback: " + fallbackCount);
+        System.out.println("--- CI HTTP ThreadPool Results ---");
+        System.out.println("Total: " + totalRequests + " | Fallbacks: " + fallbackCount);
 
-        assertThat(fallbackCount).as("Thread pool should have been saturated").isPositive();
+        assertThat(fallbackCount).as("Thread pool should be saturated").isPositive();
     }
 }
