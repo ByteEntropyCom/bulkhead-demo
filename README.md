@@ -5,8 +5,8 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.5-brightgreen)
 ![Resilience4j](https://img.shields.io/badge/Resilience4j-2.2.0-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 ![Issues](https://img.shields.io/github/issues/ByteEntropyCom/bulkhead-demo)
+![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
 A project showcasing **Semaphore Bulkhead** and **Thread Pool Bulkhead** using Resilience4j in a Spring Boot 3.2+ application with **Java 21 Virtual Threads**.
 
