@@ -6,9 +6,9 @@
 ![Resilience4j](https://img.shields.io/badge/Resilience4j-2.2.0-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
-![Issues](https://img.shields.io/github/issues/YOUR_USERNAME/bulkhead-demo)
-![Forks](https://img.shields.io/github/forks/YOUR_USERNAME/bulkhead-demo)
-![Stars](https://img.shields.io/github/stars/YOUR_USERNAME/bulkhead-demo)
+![Issues](https://img.shields.io/github/issues/ByteEntropyCom/bulkhead-demo)
+![Forks](https://img.shields.io/github/forks/ByteEntropyCom/bulkhead-demo)
+![Stars](https://img.shields.io/github/stars/ByteEntropyCom/bulkhead-demo)
 
 This project demonstrates how to implement the **Bulkhead pattern** using **Resilience4j** in a **Spring Boot 3** application with **Java 21 Virtual Threads**.
 
