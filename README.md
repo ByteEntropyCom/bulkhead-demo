@@ -89,5 +89,7 @@ resilience4j.thread-pool-bulkhead.metrics.enabled=true
 ```
 
 
+## 5. License
+MIT License
 
 
