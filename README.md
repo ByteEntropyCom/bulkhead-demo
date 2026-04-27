@@ -42,20 +42,30 @@ The Bulkhead pattern isolates different parts of a system to prevent cascading f
 
 ```properties
 spring.application.name=bulkhead-demo
-server.port=8080
+server.port==${PORT:8080}
 
-# Enable Virtual Threads (Java 21)
+# Java 21 Virtual Threads Support
 spring.threads.virtual.enabled=true
 
-# Semaphore Bulkhead
-resilience4j.bulkhead.instances.serviceA.max-concurrent-calls=5
-resilience4j.bulkhead.instances.serviceA.max-wait-duration=0
+# Semaphore Bulkhead (serviceA)
+resilience4j.bulkhead.instances.serviceA.max-concurrent-calls=${BULKHEAD_A_LIMIT:5}
+resilience4j.bulkhead.instances.serviceA.max-wait-duration=${BULKHEAD_A_WAIT:0}
 
-# Thread Pool Bulkhead
-resilience4j.thread-pool-bulkhead.instances.serviceB.max-thread-pool-size=3
-resilience4j.thread-pool-bulkhead.instances.serviceB.core-thread-pool-size=2
-resilience4j.thread-pool-bulkhead.instances.serviceB.queue-capacity=1
-resilience4j.thread-pool-bulkhead.instances.serviceB.keep-alive-duration=100ms
+# Thread Pool Bulkhead (serviceB)
+resilience4j.thread-pool-bulkhead.instances.serviceB.max-thread-pool-size=${BULKHEAD_B_SIZE:3}
+resilience4j.thread-pool-bulkhead.instances.serviceB.core-thread-pool-size=${BULKHEAD_B_CORE:2}
+resilience4j.thread-pool-bulkhead.instances.serviceB.queue-capacity=${BULKHEAD_B_QUEUE:1}
+resilience4j.thread-pool-bulkhead.instances.serviceB.keep-alive-duration=${BULKHEAD_B_KEEP_ALIVE:100ms}
+
+# Which endpoints to show? (Default: health, can be overridden to 'health,metrics,prometheus')
+management.endpoints.web.exposure.include=${MONITORING_ENDPOINTS:health}
+
+# Toggle metrics collection (Default: true)
+resilience4j.bulkhead.metrics.enabled=${ENABLE_BULKHEAD_METRICS:true}
+resilience4j.thread-pool-bulkhead.metrics.enabled=${ENABLE_THREADPOOL_METRICS:true}
+
+# Common tags for metrics (helpful for identifying which app instance is sending data)
+management.metrics.tags.application=${spring.application.name}
 ```
 
 ---
