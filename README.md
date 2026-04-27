@@ -226,6 +226,25 @@ Then open:
 
 ---
 
+## 📊 Monitoring & Observability
+This project is "production-ready" with built-in monitoring via Spring Boot Actuator and Micrometer. You can track the health and performance of your bulkheads in real-time.
+
+### 1. Accessing Metrics
+
+Once the application is running, you can view the raw Prometheus metrics at:
+http://localhost:8080/actuator/prometheus
+
+### 2. Key Bulkhead Metrics to Watch
+
+Search (Ctrl+F) the prometheus page for bulkhead to find these critical indicators:
+
+Metric Name	Description
+resilience4j_bulkhead_concurrent_calls	Number of requests currently occupying the bulkhead.
+resilience4j_bulkhead_available_concurrent_calls	Remaining capacity before the bulkhead starts rejecting requests.
+resilience4j_bulkhead_not_permitted_calls_total	Critical: Total count of requests rejected by the bulkhead (triggered fallbacks).
+
+---
+
 ## 📌 Summary
 
 This project demonstrates:
